@@ -21,6 +21,17 @@ public class MainActivity extends DebugActivity implements android.view.View.OnC
 
         DebugViewManager.get().event("onCreate");
 
+        for (int i = 0; i < 10; i++) {
+            DebugViewManager.get().event("ssssdddd");
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    //在子线程中操作
+                    DebugViewManager.get().event("ssss");
+                }
+            }).start();
+        }
+
     }
 
     @Override

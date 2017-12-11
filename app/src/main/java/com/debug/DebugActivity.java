@@ -18,6 +18,7 @@ import java.util.Locale;
  */
 
 public class DebugActivity extends BaseActivity {
+
     private int showEventInfoState;
     private static final SimpleDateFormat logDataFormat = new SimpleDateFormat("HH:mm:ss", Locale.getDefault());
     private int logViewHeight;
@@ -67,42 +68,52 @@ public class DebugActivity extends BaseActivity {
         return super.onKeyUp(keyCode, event);
     }
 
+    TextView debugView;
+
     private void toggle() {
         ViewGroup viewGroup = (ViewGroup) findViewById(android.R.id.content);
-        TextView textView;
-        if ((textView = (TextView) viewGroup.findViewById(R.id.debug_view)) == null) {
-            textView = new TextView(getApplicationContext());
-            textView.setWidth(ViewGroup.LayoutParams.MATCH_PARENT);
-            textView.setHeight(ViewGroup.LayoutParams.MATCH_PARENT);
-            textView.setTextColor(0xFF_FF_FF_FF);
-            textView.setBackgroundColor(0xB3_00_00_00);
-            textView.setTextSize(15);
-            textView.setPadding(20, 20, 20, 20);
-            textView.setId(R.id.debug_view);
-            viewGroup.addView(textView);
-            textView.setVisibility(View.GONE);
-        }
-        if (textView.getVisibility() == View.GONE) {
-            textView.setVisibility(View.VISIBLE);
-            textView.setText("\n\n同时按下音量加减键，关闭调试信息");
-            textView.append("\n");
+
+        if (debugView == null) {
+            debugView = new TextView(getApplicationContext());
+            debugView.setWidth(ViewGroup.LayoutParams.MATCH_PARENT);
+            debugView.setHeight(ViewGroup.LayoutParams.MATCH_PARENT);
+            debugView.setTextColor(0xFF_FF_FF_FF);
+            debugView.setBackgroundColor(0xB3_00_00_00);
+            debugView.setTextSize(15);
+            debugView.setPadding(20, 20, 20, 20);
+            debugView.setId(R.id.debug_view);
+            viewGroup.addView(debugView);
         } else {
-            textView.setVisibility(View.GONE);
+            if (debugView.getVisibility() == View.GONE) {
+                debugView.setVisibility(View.VISIBLE);
+            } else {
+                debugView.setVisibility(View.GONE);
+            }
         }
+
+        if (debugView.getVisibility() == View.VISIBLE) {
+            debugView.setText("\n\n同时按下音量加减键，关闭调试信息");
+            debugView.append("\n");
+        }
+
     }
 
-    private void showLog(String log) {
-        if (findViewById(R.id.debug_view) != null) {
-            TextView textView = (TextView) findViewById(R.id.debug_view);
-            textView.append("\n");
-            textView.append(logDataFormat.format(new Date()).toString() + " -> ");
-            textView.append(log);
+    private void showLog(final String log) {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
 
-            if ((textView.getLineHeight() * textView.getLineCount()) > logViewHeight) {
-                textView.scrollBy(0, textView.getLineHeight());
+                if (debugView != null && debugView.getVisibility() == View.VISIBLE) {
+                    debugView.append("\n");
+                    debugView.append(logDataFormat.format(new Date()).toString() + " -> ");
+                    debugView.append(log);
+
+                    if ((debugView.getLineHeight() * debugView.getLineCount()) > logViewHeight) {
+                        debugView.scrollBy(0, debugView.getLineHeight());
+                    }
+                }
             }
-
-        }
+        });
     }
 
     @Override
