@@ -1,11 +1,13 @@
 package com.debug;
 
-import android.support.v7.app.AppCompatActivity;
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.TextView;
 
-public class MainActivity extends AppCompatActivity implements android.view.View.OnClickListener{
+import com.debug.util.DebugViewManager;
+
+public class MainActivity extends DebugActivity implements android.view.View.OnClickListener {
 
     TextView textView;
 
@@ -15,13 +17,20 @@ public class MainActivity extends AppCompatActivity implements android.view.View
         setContentView(R.layout.activity_main);
 
         textView = (TextView) findViewById(R.id.tv);
+        textView.setOnClickListener(this);
 
-        String s = "";
+        DebugViewManager.get().event("onCreate");
 
     }
 
     @Override
     public void onClick(View view) {
-
+        switch (view.getId()) {
+            case R.id.tv:
+                DebugViewManager.get().event("正在跳转");
+                startActivity(new Intent(MainActivity.this, Activity2.class));
+                DebugViewManager.get().event("跳转结束");
+                break;
+        }
     }
 }
